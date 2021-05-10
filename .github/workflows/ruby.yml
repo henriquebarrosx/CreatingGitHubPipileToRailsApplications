@@ -1,0 +1,51 @@
+name: Ruby
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: Project CI
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_DB: rails_github_actions_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2 # Setup project ruby version
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -yqq install libpq-dev build-essential libcurl4-openssl-dev postgresql postgresql-contrib
+          gem install pg
+          bundle install --jobs 4 --retry 3
+      - name: Running Rspec tests
+        env:
+          RAILS_ENV: test
+          PGHOST: localhost
+          DATABASE: rails_tdd_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        run: |
+          bundle exec rails db:schema:load
+          bundle exec rspec --format progress
