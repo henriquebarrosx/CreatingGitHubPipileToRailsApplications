@@ -31,7 +31,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2 # Setup project ruby version
+          ruby-version: 3.0.0 # Setup project ruby version
           bundler-cache: true
 
       - name: Install dependencies
