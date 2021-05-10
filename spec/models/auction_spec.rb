@@ -1,9 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe Auction, type: :model do
+  let :seller do
+    User.new(
+      email: 'name@example.com',
+      password: '123456'
+    )
+  end
+
   subject do
     Auction
       .new(
+        user_id: User.last,
         title: 'Anything',
         description: 'Lorem ipsum',
         start_date: DateTime.now,
@@ -20,5 +28,9 @@ RSpec.describe Auction, type: :model do
       subject.title = nil
       expect(subject).to be_invalid
     end
+  end
+
+  describe 'Validate model associations' do
+    it { should belong_to(:user).without_validating_presence }
   end
 end
